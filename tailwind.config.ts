@@ -9,8 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        rubik: ["Rubik", "sans-serif"],
-        playfair: ["Playfair Display", "serif"],
+        libreBaskerville: ["Libre Baskerville", "serif"],
+        inter: ["Inter", "sans-serif"],
+      },
+      colors: {
+        primary: "#55348A",
+        secondary: "#CCB7EE",
       },
     },
   },
