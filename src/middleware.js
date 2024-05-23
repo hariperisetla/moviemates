@@ -12,12 +12,16 @@ export async function middleware(req) {
     );
   }
 
+  // Check if the user is logged in and trying to access /
+  if (url.pathname === "/" && accessToken) {
+    // User is authenticated, redirect to /home
+    return NextResponse.redirect(new URL("/home", req.url));
+  }
+
   // Check if the user is logged in and trying to access /home
-  if (url.pathname === "/home") {
-    if (!accessToken) {
-      // User is not authenticated, redirect to /
-      return NextResponse.redirect(new URL("/", req.url));
-    }
+  if (url.pathname === "/home" && !accessToken) {
+    // User is not authenticated, redirect to /
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // Restrict access to certain routes if the user is not authenticated
