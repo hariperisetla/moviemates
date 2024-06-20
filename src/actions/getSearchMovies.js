@@ -37,8 +37,6 @@ export async function getSearchMovies(query) {
       })
     );
 
-    console.log(moviesWithImages);
-
     return moviesWithImages;
   } catch (error) {
     console.log("Error fetching watchlist: " + error);

@@ -3,9 +3,8 @@
 import { cookies } from "next/headers";
 
 async function getHistory() {
+  const access_token = cookies().get("access_token").value;
   try {
-    const access_token = cookies().get("access_token").value;
-
     const response = await fetch(`https://api.trakt.tv/sync/history/movies`, {
       method: "GET",
       headers: {
@@ -25,9 +24,8 @@ async function getHistory() {
 }
 
 export async function removeFromHistory(movieId) {
+  const access_token = cookies().get("access_token").value;
   try {
-    const access_token = cookies().get("access_token").value;
-
     const response = await fetch(`https://api.trakt.tv/sync/history/remove`, {
       method: "POST",
       headers: {
@@ -68,9 +66,8 @@ export async function removeFromHistory(movieId) {
 }
 
 export async function setWatchedMovies(movie) {
+  const access_token = cookies().get("access_token").value;
   try {
-    const access_token = cookies().get("access_token").value;
-
     // Fetch the watched history first
     const history = await getHistory();
 

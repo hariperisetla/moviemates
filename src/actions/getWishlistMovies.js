@@ -3,9 +3,8 @@
 import { cookies } from "next/headers";
 
 export async function getWishlistMovies(limit = null) {
+  const access_token = cookies().get("access_token").value;
   try {
-    const access_token = cookies().get("access_token").value;
-
     const response = await fetch(
       `https://api.trakt.tv/sync/watchlist/movies${
         limit ? `?limit=${limit}` : ""
@@ -21,8 +20,6 @@ export async function getWishlistMovies(limit = null) {
     );
 
     const watchList = await response.json();
-
-    console.log(watchList);
 
     // Fetch image URLs for each movie
     const moviesWithImages = await Promise.all(

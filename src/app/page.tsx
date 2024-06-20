@@ -2,25 +2,30 @@ import Image from "next/image";
 import Link from "next/link";
 import { MdMovieCreation } from "react-icons/md";
 import { BiMenuAltLeft } from "react-icons/bi";
+import Logo from "@/assets/logo.svg";
 
 export default function Home() {
   return (
     <div>
-      <div className="flex justify-between p-3 items-center">
+      <div className="flex w-full justify-between p-3 items-center absolute">
         <Link
           href={"/"}
-          className=" gap-2 font-bold font-libreBaskerville text-primary text-2xl md:text-3xl flex items-center"
+          className=" gap-2 font-bold text-primary text-2xl md:text-3xl flex items-center"
         >
-          <MdMovieCreation className="text-3xl md:text-4xl" />
-          <span>MovieMates</span>
+          <div className="relative">
+            <Image src={Logo} alt="logo" width="50" height="50" />
+          </div>
+          <p className="text-primary pt-2">
+            Movie<span className="text-gray">Mates</span>
+          </p>
         </Link>
 
         <div className="flex md:hidden">
           <BiMenuAltLeft className="text-4xl" />
         </div>
 
-        <ul className="hidden md:flex gap-5 items-center">
-          <li>Home</li>
+        <ul className="hidden md:flex gap-5 items-center font-bold text-gray">
+          <li className="text-primary">Home</li>
           <li>About</li>
           <li>Contact Us</li>
           <Link href={"/login"} className="">
@@ -35,14 +40,14 @@ export default function Home() {
         </ul>
       </div>
 
-      <main className="h-[93.2vh] md:h-[92.8vh]">
+      <main className="h-screen pt-16">
         {/* bg-gradient-to-br from-secondary from-30% via-[#d5def3] via-50% to-secondary to-90% */}
-        <section className="container max-w-5xl grid md:grid-cols-3 space-y-24 md:space-y-5 max-w-7x h-[80%] md:h-full justify-center items-center mx-auto px-5">
+        <section className="container grid grid-cols-1 md:grid-cols-3 md:space-y-5 max-w-7xl h-full justify-center items-center mx-auto px-5">
           <div className="md:col-span-2 space-y-5">
-            <h2 className="font-libreBaskerville font-semibold text-primary text-2xl md:text-7xl leading-normal md:leading-tight">
+            <h2 className="font-bold text-primary text-3xl md:text-7xl">
               Never run out of things to watch together.
             </h2>
-            <p className="text-2xl">
+            <p className="text-lg md:text-2xl text-gray font-medium">
               Create shareable lists of movies and TV shows from all over the
               world to watch with your mates.
             </p>
@@ -58,12 +63,21 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="h-[150%] md:h-1/2 w-full relative ">
+          <div className="justify-center md:justify-end flex">
             <Image
               src={"/img/iPhone-mockup.svg"}
               alt="iphone mockup"
-              fill
-              className="object-contain"
+              width={300}
+              height={100}
+              className="object-cover object-center hidden md:flex"
+            />
+
+            <Image
+              src={"/img/iPhone-mockup.svg"}
+              alt="iphone mockup"
+              width={200}
+              height={100}
+              className="object-cover object-center flex md:hidden"
             />
           </div>
         </section>

@@ -197,11 +197,12 @@ export default function DashboardLayout({ children }) {
                 <div className="bg-white absolute z-10 w-full">
                   {searchResults?.map((result, index) => (
                     <div key={index} className=" py-2 px-5">
+                      {console.log(result.movie.ids)}
                       <Link
-                        href={`/movie/${result.movie.id}`}
+                        href={`/movies/${result.movie.ids.slugs}`}
                         className="flex gap-3"
                       >
-                        <div className="relative h-48 w-32">
+                        <div className="relative h-20 w-12">
                           <Image
                             src={`https://image.tmdb.org/t/p/w1280${result.imageUrl}`}
                             alt={result.movie.title}

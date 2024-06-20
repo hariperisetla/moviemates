@@ -3,9 +3,8 @@
 import { cookies } from "next/headers";
 
 export async function getHistory(id) {
+  const access_token = cookies().get("access_token").value;
   try {
-    const access_token = cookies().get("access_token").value;
-
     const response = await fetch(
       `https://api.trakt.tv/sync/history/movies/${id}?limit=10`,
       {

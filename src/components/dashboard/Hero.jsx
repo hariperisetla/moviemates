@@ -4,9 +4,8 @@ import React from "react";
 import { GoDotFill } from "react-icons/go";
 
 async function getData() {
+  const access_token = cookies().get("access_token").value;
   try {
-    const access_token = cookies().get("access_token").value;
-
     const response = await fetch(
       `https://api.trakt.tv/sync/watchlist/movies?limit=1&extended=full`,
       {
@@ -94,7 +93,7 @@ export default async function Hero() {
           </div>
 
           <div className="md:col-span-4 md:text-left px-5 md:px-0 space-y-3 md:space-y-8 text-white z-20 text-center">
-            <h2 className="font-libreBaskerville pb-2 text-2xl flex-wrap md:text-5xl">
+            <h2 className="pb-2 text-2xl flex-wrap md:text-5xl font-bold">
               {movie.movie.title}
             </h2>
             <p className="md:text-xl">
