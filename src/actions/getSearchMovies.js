@@ -15,8 +15,6 @@ export async function getSearchMovies(query) {
 
     const searchResults = await response.json();
 
-    console.log(searchResults);
-
     // Fetch image URLs for each movie
     const moviesWithImages = await Promise.all(
       searchResults.map(async (movies) => {
@@ -39,7 +37,7 @@ export async function getSearchMovies(query) {
 
     return moviesWithImages;
   } catch (error) {
-    console.log("Error fetching watchlist: " + error);
+    console.log("Error fetching Search results: " + error);
     return null;
   }
 }

@@ -13,6 +13,23 @@ import { getSearchMovies } from "@/actions/getSearchMovies";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+// Custom hook for debouncing
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 // async function getData() {
 //   try {
 //     const response = await fetch(`https://api.trakt.tv/genres/movies`, {
@@ -37,6 +54,8 @@ export default function DashboardLayout({ children }) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 500); // Adjust the delay as needed
 
   const genres = [
     { name: "Action", slug: "action" },
@@ -70,8 +89,8 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     async function handleSearch() {
-      if (searchQuery) {
-        const results = await getSearchMovies(searchQuery);
+      if (debouncedSearchQuery) {
+        const results = await getSearchMovies(debouncedSearchQuery);
         setSearchResults(results);
       } else {
         setSearchResults([]);
@@ -79,7 +98,7 @@ export default function DashboardLayout({ children }) {
     }
 
     handleSearch();
-  }, [searchQuery]);
+  }, [debouncedSearchQuery]);
 
   return (
     <div className="bg-radial-bg bg-cover bg-repeat backdrop-blur-3xl relative min-h-screen max-h-screen overflow-hidden">
@@ -195,25 +214,26 @@ export default function DashboardLayout({ children }) {
                 </div>
 
                 <div className="bg-white absolute z-10 w-full">
-                  {searchResults?.map((result, index) => (
-                    <div key={index} className=" py-2 px-5">
-                      {console.log(result.movie.ids)}
-                      <Link
-                        href={`/movies/${result.movie.ids.slugs}`}
-                        className="flex gap-3"
-                      >
-                        <div className="relative h-20 w-12">
-                          <Image
-                            src={`https://image.tmdb.org/t/p/w1280${result.imageUrl}`}
-                            alt={result.movie.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        {result.movie.title}
-                      </Link>
-                    </div>
-                  ))}
+                  {searchResults &&
+                    searchResults.slice(0, 5).map((result, index) => (
+                      <div key={index} className=" py-2 px-5">
+                        {console.log("Result: " + result.movie.ids.slug)}
+                        <Link
+                          href={`/movies/${result.movie.ids.slug}`}
+                          className="flex gap-3"
+                        >
+                          <div className="relative h-20 w-12">
+                            <Image
+                              src={`https://image.tmdb.org/t/p/w1280${result.imageUrl}`}
+                              alt={result.movie.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          {result.movie.title}
+                        </Link>
+                      </div>
+                    ))}
                 </div>
               </div>
               <div className="flex text-4xl gap-3 items-center text-primary">
