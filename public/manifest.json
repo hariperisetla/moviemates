@@ -2,7 +2,7 @@
     "theme_color": "#fff",
     "background_color": "#fff",
     "display": "standalone",
-    "scope": "/",
+    "scope": "/app",
     "start_url": "/",
     "name": "MovieMates",
     "short_name": "MovieMates",

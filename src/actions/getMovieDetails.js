@@ -27,8 +27,19 @@ export async function getMovieDetails(slug) {
     );
 
     const imageData = await imageResponse.json();
-    // Filter for non-portrait images (backdrops)
-    const portraitImages = imageData.posters;
+
+    // Filter for portrait images with aspect ratio close to 350x450 or less than the 450 ratio, and text in English or matching movie language
+    const portraitImages = imageData.posters.filter((image) => {
+      const aspectRatio = image.width / image.height;
+      const isEnglish = image.iso_639_1 === "en";
+      const isMatchingLanguage = movieData.language === image.iso_639_1;
+
+      return (
+        (aspectRatio <= 350 / 450 || aspectRatio < 450 / image.height) &&
+        (isEnglish || isMatchingLanguage)
+      );
+    });
+
     const landscapeImages = imageData.backdrops;
 
     const movieWithImage = {

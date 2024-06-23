@@ -7,6 +7,9 @@ import { getMovieDetails } from "@/actions/getMovieDetails";
 import { useEffect, useState } from "react";
 
 import { getHistory } from "@/actions/getHistory";
+import { BiBookmark } from "react-icons/bi";
+import { BsBookmark } from "react-icons/bs";
+import { MdBookmarkAdd } from "react-icons/md";
 
 export default function MovieDetails({ params }) {
   const [movie, setMovie] = useState();
@@ -52,88 +55,146 @@ export default function MovieDetails({ params }) {
   return (
     <div className="movie-details ">
       {movie && (
-        <div className="relative w-full h-[33rem] md:h-[35rem] rounded-3xl overflow-hidden">
-          {/* <div className="bg-transparent h-[31rem] md:h-[35rem] w-full absolute z-10 opacity-80"></div> */}
-          <Image
-            src={`https://image.tmdb.org/t/p/w1280${movie.landscapeImageUrl}`}
-            alt={movie.title}
-            fill
-            className="object-cover object-top blur"
-          />
+        <div className="relative hidden md:flex w-full h-[15rem] md:h-[35rem] rounded-[2rem] md:rounded-[3rem] overflow-hidden">
+          <div className="absolute h-[15rem] md:h-full w-full z-0">
+            <div className="bg-gradient-to-t from-black from-10% to-transparent h-[15rem] md:h-[35rem] w-full absolute z-10 opacity-50"></div>
+            <Image
+              src={`https://image.tmdb.org/t/p/w1280${movie.landscapeImageUrl}`}
+              alt={movie.title + " image"}
+              fill
+              className="object-cover object-top"
+            />
 
-          <div className="container grid md:grid-cols-5 max-w-7xl gap-3 md:gap-52 md:h-full items-center mx-auto justify-center">
-            <div className="w-48 md:w-64 h-64 md:h-96 relative z-20 rounded-3xl overflow-hidden hidden md:flex shadow">
-              <Image
-                src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
-                alt={movie.title + " image"}
-                fill
-                className="object-cover object-top"
-              />
+            <div className="absolute shadow z-10 right-5 top-5 flex">
+              {/* <span className="bg-primary/50 text-white rounded-l-2xl pl-3 items-center flex">
+                <GoDotFill size={30} className="animate-pulse text-green-300" />
+              </span>
+              <select
+                name=""
+                id=""
+                className="border-lightGray outline-none py-3 pr-3 bg-black/50 rounded-r-2xl text-white"
+              >
+                <option value="" selected>
+                  Watched
+                </option>
+                <option value="">Not Watched</option>
+              </select> */}
             </div>
 
-            {/* For mobile */}
-            <div className="w-full md:hidden justify-center items-center flex md:pt-0 pt-5">
-              <div className="w-48 md:w-64 h-64 md:h-96 relative z-20 rounded-3xl overflow-hidden">
-                <Image
-                  src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
-                  alt={movie.title + " image"}
-                  fill
-                  className="object-cover object-top"
-                />
-              </div>
-            </div>
-
-            <div className="md:col-span-4 md:text-left px-5 md:px-0 space-y-3 md:space-y-8 text-white z-20 text-center">
-              <h2 className="font-libreBaskerville pb-2 text-2xl flex-wrap md:text-5xl">
-                {movie.title}
-              </h2>
-              <p className="md:text-xl">
-                In your <span className="underline">Next Watch</span> List
-              </p>
-              <div className="flex flex-row justify-center md:justify-start gap-2 md:gap-5 text-sm md:text-base">
-                <p>{runtime}</p>
+            <div className="flex items-end h-full pb-8">
+              <div className="md:text-left px-5 md:px-8 space-y-3 md:space-y-3 text-white z-20 text-center max-w-4xl">
                 <div className="space-x-1 md:space-x-3 flex justify-center md:justify-start items-center md:items-start">
                   {movie.genres.map((genre, index) => (
-                    <p key={index} className="capitalize flex items-center">
+                    <p
+                      key={index}
+                      className="capitalize flex items-center bg-white/30 shadow  rounded-[3rem] px-4 py-1"
+                    >
                       {genre}
-                      {index !== movie.genres.length - 1 && (
-                        <span className="pl-1 md:pl-2">
-                          <GoDotFill />
-                        </span>
-                      )}
+                      {/* {index !== movie.movie.genres.length - 1 && (
+                      <span className="pl-1 md:pl-2">
+                        <GoDotFill />
+                      </span>
+                    )} */}
                     </p>
                   ))}
-                </div>{" "}
-                <p>{movie.certification ? movie.certification : "N/A"}</p>
-              </div>
+                </div>
+                <h2 className="pb-2 flex flex-wrap w-full text-2xl md:text-5xl font-bold">
+                  {movie.title}
+                </h2>
+                {/* <p className="md:text-xl">
+              In your <span className="underline">Next Watch</span> List
+            </p> */}
+                <div className="flex justify-start gap-2 md:gap-5 text-lg">
+                  <p>{movie.year}</p>
+                  <p>|</p>
+                  <p>{runtime}</p>
+                  <p>|</p>
+                  <p>{movie.certification ? movie.certification : "N/A"}</p>
+                </div>
 
-              <div className="flex justify-center md:justify-start items-center md:text-xl font-semibold gap-5">
-                <button className="bg-secondary shadow text-primary px-5 py-2 rounded-md">
-                  Tell A Mate
-                </button>{" "}
-                <button className="underline md:text-xl">
-                  Remove from List
-                </button>
-              </div>
-
-              <div>
-                <button
-                  onClick={addWatched}
-                  className={`md:text-xl ${
-                    isWatched ? "bg-green-500" : "bg-red-500"
-                  } px-5 py-2 rounded-md`}
-                >
-                  {isWatched ? "Watched" : "Not Watched"}
-                </button>
+                <div className="hidden md:flex justify-center md:justify-start items-center md:text-xl font-semibold gap-3">
+                  <button
+                    onClick={addWatched}
+                    className="text-base md:text-xl text-primary border-2 border-secondary bg-secondary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3"
+                  >
+                    Tell A Mate
+                  </button>
+                  <button
+                    className={`${
+                      isWatched
+                        ? "border-2 border-green-500 bg-green-500/30"
+                        : "border-2 border-secondary/50"
+                    }  flex items-center gap-2 shadow-md text-white md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl`}
+                  >
+                    {/* <span>
+                      <BiBookmark size={25} />
+                    </span> */}
+                    <span>{isWatched ? "Watched" : "Mark as Watched"}</span>
+                  </button>
+                  <button
+                    onClick={addWatched}
+                    className="text-sm md:text-xl border-2 border-secondary/30 bg-secondary/30 rounded-3xl md:px-4 md:py-2"
+                  >
+                    <MdBookmarkAdd size={35} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
-      <div className="px-5 pt-3 space-y-5">
-        <h1 className="text-indigo-600 text-2xl font-bold">
+
+      {movie && (
+        <div className="px-5 md:hidden relative h-[30rem] w-full rounded-3xl overflow-hidden">
+          <Image
+            src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
+            alt={movie.title + " image"}
+            fill
+            className="object-cover object-center rounded-3xl"
+          />
+        </div>
+      )}
+      <div className="pt-3 space-y-5">
+        {/* <div>
+          <button
+            onClick={addWatched}
+            className={`md:text-xl ${
+              isWatched ? "bg-green-500" : "bg-red-500"
+            } px-5 py-2 rounded-md`}
+          >
+            {isWatched ? "Watched" : "Not Watched"}
+          </button>
+        </div> */}
+        {/* <h1 className="text-primary text-2xl font-bold">
           {movie && movie.title}
-        </h1>
+        </h1> */}
+        <div className="flex md:hidden justify-center md:justify-start items-center md:text-xl font-semibold gap-3">
+          {/* <button
+            onClick={addWatched}
+            className="text-base md:text-xl text-primary border-2 border-secondary bg-secondary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3"
+          >
+            Tell A Mate
+          </button> */}
+          <button
+            className={`${
+              isWatched
+                ? "border-2 border-green-500 bg-green-500/30"
+                : "border-2 border-secondary bg-secondary"
+            }  flex justify-center items-center gap-2 w-full text-black/75 md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl`}
+          >
+            {/* <span>
+                      <BiBookmark size={25} />
+                    </span> */}
+            <span>{isWatched ? "Watched" : "Mark as Watched"}</span>
+          </button>
+          <button
+            onClick={addWatched}
+            className="flex justify-center w-full items-center md:text-xl border-2 border-primary bg-primary text-white rounded-2xl md:rounded-3xl px-2 py-2 md:px-4 md:py-2"
+          >
+            {/* <MdBookmarkAdd size={30} />  */}
+            <span>Add to Watchlist</span>
+          </button>
+        </div>
         <p className="">{movie && movie.overview}</p>
         <p>{movie && movie.year}</p>
       </div>

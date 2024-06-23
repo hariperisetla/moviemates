@@ -10,10 +10,10 @@ export default function Home() {
       <div className="flex w-full justify-between p-3 items-center absolute">
         <Link
           href={"/"}
-          className=" gap-2 font-bold text-primary text-2xl md:text-3xl flex items-center"
+          className="pb-2 gap-2 font-bold text-primary text-2xl md:text-2xl flex items-center"
         >
           <div className="relative">
-            <Image src={Logo} alt="logo" width="50" height="50" />
+            <Image src={Logo} alt="logo" width="45" height="45" />
           </div>
           <p className="text-primary pt-2">
             Movie<span className="text-gray">Mates</span>

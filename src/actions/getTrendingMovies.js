@@ -1,9 +1,9 @@
 "use server";
 
-export async function getTrendingMovies(page = 1) {
+export async function getTrendingMovies(page = 1, limit = 10) {
   try {
     const response = await fetch(
-      `https://api.trakt.tv/movies/trending?page=${page}&limit=10`,
+      `https://api.trakt.tv/movies/trending?page=${page}&limit=${limit}&extended=full`,
       {
         headers: {
           "Content-type": "application/json",
@@ -28,9 +28,19 @@ export async function getTrendingMovies(page = 1) {
           }
         );
         const imageData = await imageResponse.json();
+
+        // Filter for portrait images with English text or matching movie language
+        const portraitImages = imageData.posters.filter((image) => {
+          return (
+            image.iso_639_1 === "en" ||
+            movieData.movie.language === image.iso_639_1
+          );
+        });
+
         return {
           ...movieData,
-          imageUrl: imageData.posters[0]?.file_path || null, // Assuming you want the first poster image
+          imageUrl:
+            portraitImages.length > 0 ? portraitImages[0].file_path : null, // Assuming you want the first poster image
         };
       })
     );
