@@ -154,20 +154,24 @@ export default function Home() {
       </section>
 
       <footer className="bg-secondary py-20">
-        <div className="container max-w-5xl grid md:grid-cols-5 mx-auto items-center justify-center text-center gap-10">
+        <div className="container max-w-5xl grid md:grid-cols-5 mx-auto items-center md:items-start justify-center text-center gap-10">
           <div className="md:col-span-2 text-center md:text-left">
             <Link
               href={"/"}
-              className=" gap-2 font-bold font-libreBaskerville text-2xl md:text-3xl flex items-center"
+              className="pb-2 gap-2 font-bold text-primary text-2xl md:text-2xl flex items-center"
             >
-              <MdMovieCreation className="text-3xl md:text-4xl" />
-              <span>MovieMates</span>
+              <div className="relative">
+                <Image src={Logo} alt="logo" width="45" height="45" />
+              </div>
+              <p className="text-primary pt-2">
+                Movie<span className="text-gray">Mates</span>
+              </p>
             </Link>
-            Your Watchlist partner.
+            <p>Your Watchlist partner.</p>
           </div>
 
           <div className="space-y-5">
-            <h4 className="text-2xl font-semibold text-white">Quick Links</h4>
+            <h4 className="text-2xl font-semibold text-primary">Quick Links</h4>
             <div className="flex flex-col space-y-1">
               <Link href={"/"}>Home</Link>
               <Link href={"/"}>About</Link>
@@ -175,14 +179,16 @@ export default function Home() {
             </div>
           </div>
           <div className="space-y-5">
-            <h4 className="text-2xl font-semibold text-white">Legal</h4>
+            <h4 className="text-2xl font-semibold text-primary">Legal</h4>
             <div className="flex flex-col space-y-1">
               <Link href={"/"}>Privacy Policy</Link>
               <Link href={"/"}>Terms of Use</Link>
             </div>
           </div>
           <div className="space-y-5">
-            <h4 className="text-2xl font-semibold text-white">Social Links</h4>
+            <h4 className="text-2xl font-semibold text-primary">
+              Social Links
+            </h4>
             <div className="flex flex-col space-y-1">
               <Link href={"/"}>Facebook</Link>
               <Link href={"/"}>Instagram</Link>

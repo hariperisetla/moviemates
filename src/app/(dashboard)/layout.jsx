@@ -15,6 +15,7 @@ import Image from "next/image";
 
 import Logo from "@/assets/logo.svg";
 import { IoAddCircle, IoSearch } from "react-icons/io5";
+import { useRouter } from "next/navigation";
 
 // Custom hook for debouncing
 function useDebounce(value, delay) {
@@ -90,6 +91,25 @@ export default function DashboardLayout({ children }) {
     { name: "Western", slug: "western" },
   ];
 
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (response.ok) {
+        // Redirect to the home page or any other page after logout
+        router.push("/");
+      } else {
+        console.error("Failed to logout:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Failed to logout:", error.message);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     async function handleSearch() {
       if (debouncedSearchQuery) {
@@ -134,7 +154,12 @@ export default function DashboardLayout({ children }) {
               </Link>
               <Link href={"/watchlist"} className="flex gap-1 items-center">
                 {/* <MdFavorite /> */}
-                Watchlist
+                <p className="flex relative">
+                  <span>Watchlist</span>{" "}
+                  <span className="bg-red-500 -right-10 text-center rounded-full text-white absolute w-6 h-6">
+                    1
+                  </span>
+                </p>
               </Link>
               <Link href={"/"} className="flex gap-1 items-center">
                 {/* <MdFavorite /> */}
@@ -183,7 +208,15 @@ export default function DashboardLayout({ children }) {
             </div>
           </div>
 
-          <div className="text-lg font-semibold text-red-500">Logout</div>
+          <div>
+            <button
+              onClick={handleLogout}
+              disabled={loading}
+              className="text-lg font-semibold text-red-500"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* <div className="space-y-3 px-3">
@@ -313,7 +346,7 @@ export default function DashboardLayout({ children }) {
           </div>
         </div>
       </div>
-      <div className="flex md:hidden relative">
+      <div className="flex md:hidden">
         <BottomTabs />
       </div>
     </div>

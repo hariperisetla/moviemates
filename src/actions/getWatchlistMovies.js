@@ -2,12 +2,12 @@
 
 import { cookies } from "next/headers";
 
-export async function getWishlistMovies(limit = null) {
+export async function getWatchlistMovies(limit = null) {
   const access_token = cookies().get("access_token").value;
   try {
     const response = await fetch(
-      `https://api.trakt.tv/sync/watchlist/movies${
-        limit ? `?limit=${limit}` : ""
+      `https://api.trakt.tv/sync/watchlist/movies?extended=full${
+        limit ? `&limit=${limit}` : ""
       }`,
       {
         headers: {
@@ -34,9 +34,16 @@ export async function getWishlistMovies(limit = null) {
           }
         );
         const imageData = await imageResponse.json();
+
+        const portraitImages = imageData.posters;
+        const landscapeImages = imageData.backdrops;
+
         return {
-          ...movies,
-          imageUrl: imageData.posters[0]?.file_path || null, // Assuming you want the first poster image
+          movie: movies.movie,
+          portraitImageUrl:
+            portraitImages.length > 0 ? portraitImages[0].file_path : null,
+          landscapeImageUrl:
+            landscapeImages.length > 0 ? landscapeImages[0].file_path : null,
         };
       })
     );

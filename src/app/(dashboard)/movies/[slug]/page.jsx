@@ -9,28 +9,74 @@ import { useEffect, useState } from "react";
 import { getHistory } from "@/actions/getHistory";
 import { BiBookmark } from "react-icons/bi";
 import { BsBookmark } from "react-icons/bs";
-import { MdBookmarkAdd } from "react-icons/md";
+import { MdBookmarkAdd, MdBookmarkAdded } from "react-icons/md";
+
+import { getPersons } from "@/actions/getPersons";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoPerson } from "react-icons/io5";
+
+import TraktLogo from "@/assets/trakt-icon-red.svg";
+import IMDBLogo from "@/assets/IMDB.svg";
+import RottenTomatoesLogo from "@/assets/Rotten_Tomatoes.png";
+import TMDBLogo from "@/assets/Tmdb.new.logo.png";
+import MetacriticLogo from "@/assets/Metacritic_M.png";
+
+import { setWatchlistMovies } from "@/actions/setWatchlistMovies";
 
 export default function MovieDetails({ params }) {
   const [movie, setMovie] = useState();
+  const [person, setPerson] = useState();
+
+  const [startIndex, setStartIndex] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(7); // Number of persons to display at a time
   const [isWatched, setIsWatched] = useState(false);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
 
   useEffect(() => {
     async function fetchMovieDetails() {
-      let data = await getMovieDetails(params.slug);
+      try {
+        const movieData = await getMovieDetails(params.slug);
+        const personsData = await getPersons(params.slug);
 
-      setMovie(data);
+        setMovie(movieData);
+        setPerson(personsData);
 
-      if (data && data.ids && data.ids.trakt) {
-        const history = await getHistory(data.ids.trakt);
-        const watched =
-          history &&
-          history.some((entry) => entry.movie.ids.trakt === data.ids.trakt);
-        setIsWatched(watched);
+        if (movieData && movieData.ids && movieData.ids.trakt) {
+          const history = await getHistory(movieData.ids.trakt);
+          const watched = history.some(
+            (entry) => entry.movie.ids.trakt === movieData.ids.trakt
+          );
+          setIsWatched(watched);
+        }
+
+        // Check if movie is in watchlist
+        // Assuming movie.isInWatchlist is set in getMovieDetails or needs to be checked separately
+        setIsInWatchlist(movieData.isInWatchlist || false);
+      } catch (error) {
+        console.error("Error fetching movie details:", error);
       }
     }
 
     fetchMovieDetails();
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        setItemsPerPage(7);
+      } else if (window.innerWidth >= 1024) {
+        setItemsPerPage(5);
+      } else if (window.innerWidth >= 768) {
+        setItemsPerPage(4);
+      } else {
+        setItemsPerPage(5);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [params.slug]);
 
   async function addWatched() {
@@ -52,17 +98,46 @@ export default function MovieDetails({ params }) {
   const minutes = movie?.runtime % 60;
   const runtime = `${hours}h ${minutes}m`;
 
+  const handleUpdateWatchlist = async (movieId) => {
+    try {
+      await setWatchlistMovies(movieId);
+      setIsInWatchlist((prev) => !prev); // Toggle the isInWatchlist state
+    } catch (error) {
+      console.error("Error updating watchlist:", error);
+    }
+  };
+
+  const handleForward = () => {
+    setStartIndex((prevIndex) =>
+      Math.min(prevIndex + itemsPerPage, person.length)
+    );
+  };
+
+  const handleBackward = () => {
+    setStartIndex((prevIndex) => Math.max(prevIndex - itemsPerPage, 0));
+  };
+  const displayedPersons = person?.slice(startIndex, startIndex + itemsPerPage);
+
   return (
-    <div className="movie-details ">
+    <div className="movie-details pb-10">
       {movie && (
         <div className="relative hidden md:flex w-full h-[15rem] md:h-[35rem] rounded-[2rem] md:rounded-[3rem] overflow-hidden">
           <div className="absolute h-[15rem] md:h-full w-full z-0">
             <div className="bg-gradient-to-t from-black from-10% to-transparent h-[15rem] md:h-[35rem] w-full absolute z-10 opacity-50"></div>
+
             <Image
-              src={`https://image.tmdb.org/t/p/w1280${movie.landscapeImageUrl}`}
+              src={`https://image.tmdb.org/t/p/w1280${
+                movie.landscapeImageUrl
+                  ? movie.landscapeImageUrl
+                  : movie.portraitImageUrl
+              }`}
               alt={movie.title + " image"}
               fill
-              className="object-cover object-top"
+              priority={true}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={`object-cover ${
+                movie.landscapeImageUrl ? "object-top" : "object-center"
+              }`}
             />
 
             <div className="absolute shadow z-10 right-5 top-5 flex">
@@ -132,10 +207,16 @@ export default function MovieDetails({ params }) {
                     <span>{isWatched ? "Watched" : "Mark as Watched"}</span>
                   </button>
                   <button
-                    onClick={addWatched}
-                    className="text-sm md:text-xl border-2 border-secondary/30 bg-secondary/30 rounded-3xl md:px-4 md:py-2"
+                    onClick={() => handleUpdateWatchlist(movie.ids.trakt)}
+                    className={`${
+                      isInWatchlist ? "bg-primary/30" : "bg-secondary/30"
+                    } text-sm md:text-xl border-2 border-secondary/30  rounded-3xl md:px-4 md:py-2`}
                   >
-                    <MdBookmarkAdd size={35} />
+                    {isInWatchlist ? (
+                      <MdBookmarkAdded size={35} />
+                    ) : (
+                      <MdBookmarkAdd size={35} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -150,11 +231,12 @@ export default function MovieDetails({ params }) {
             src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
             alt={movie.title + " image"}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover object-center rounded-3xl"
           />
         </div>
       )}
-      <div className="pt-3 space-y-5">
+      <div className="pt-3 space-y-8">
         {/* <div>
           <button
             onClick={addWatched}
@@ -195,8 +277,232 @@ export default function MovieDetails({ params }) {
             <span>Add to Watchlist</span>
           </button>
         </div>
-        <p className="">{movie && movie.overview}</p>
-        <p>{movie && movie.year}</p>
+        <div className="space-y-3">
+          <h3 className="text-xl text-primary font-bold">Description</h3>
+          <p className="">{movie && movie.overview}</p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="justify-between flex">
+            <h3 className="text-xl text-primary font-bold">Cast</h3>
+            <div className="flex text-3xl text-gray gap-3">
+              <button
+                className="border rounded-full border-lightGray outline-none"
+                onClick={handleBackward}
+              >
+                <IoIosArrowBack />
+              </button>
+              <button
+                className="border rounded-full border-lightGray outline-none disabled:bg-lightGray"
+                onClick={handleForward}
+                disabled={displayedPersons?.length < itemsPerPage}
+              >
+                <IoIosArrowForward />
+              </button>
+            </div>
+          </div>
+          <div
+            className={`flex md:flex-wrap gap-2 md:gap-7 overflow-hidden ${
+              displayedPersons?.length < itemsPerPage
+                ? "justify-start"
+                : "justify-evenly"
+            }`}
+          >
+            {displayedPersons?.map((person, index) => (
+              <div key={index} className="text-wrap flex flex-col">
+                <div className="rounded-3xl md:rounded-[2rem] overflow-hidden w-16 h-20 md:h-40 md:w-32 relative">
+                  {person.profileImageUrl ? (
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w200${person.profileImageUrl}`}
+                      alt={person.character}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover object-top"
+                    />
+                  ) : (
+                    <div className="bg-lightGray h-full text-center flex justify-center items-center">
+                      <IoPerson className="text-9xl text-gray" />
+                    </div>
+                  )}
+                </div>
+                <div className="w-20 md:w-32 text-wrap">
+                  <p className="flex flex-wrap text-sm md:text-base">
+                    {person.person.name}
+                  </p>
+                  <p className="text-gray break-words text-sm md:text-base">
+                    {person.character}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* <div className="space-y-3">
+          <div className="justify-between flex">
+            <h3 className="text-xl text-primary font-bold">Crew</h3>
+            <div className="flex text-3xl text-gray gap-3">
+              <button
+                className="border rounded-full border-lightGray outline-none"
+                onClick={handleBackward}
+              >
+                <IoIosArrowBack />
+              </button>
+              {console.log(displayedPersons)}
+              <button
+                className="border rounded-full border-lightGray outline-none disabled:bg-lightGray"
+                onClick={handleForward}
+                disabled={displayedPersons?.length < itemsPerPage}
+              >
+                <IoIosArrowForward />
+              </button>
+            </div>
+          </div>
+          <div
+            className={`flex flex-wrap gap-7 overflow-hidden ${
+              displayedPersons?.length < itemsPerPage
+                ? "justify-start"
+                : "justify-evenly"
+            }`}
+          >
+            {displayedPersons?.map((person, index) => (
+              <div key={index} className="text-wrap flex flex-col">
+                <div className="rounded-[2rem] overflow-hidden h-40 w-32 relative">
+                  {person.profileImageUrl ? (
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w200${person.profileImageUrl}`}
+                      alt={person.character}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover object-top"
+                    />
+                  ) : (
+                    <div className="bg-lightGray h-full text-center flex justify-center items-center">
+                      <IoPerson className="text-9xl text-gray" />
+                    </div>
+                  )}
+                </div>
+                <div className="w-32 text-wrap">
+                  <p className="flex flex-wrap">{person.person.name}</p>
+                  <p className="text-gray break-words">{person.character}</p>
+                </div>
+              </div>
+            ))}
+          </div> 
+        </div>*/}
+
+        <div className="space-y-3 grid md:grid-cols-3 gap-10">
+          <div className="md:col-span-2 space-y-3">
+            <h3 className="text-xl text-primary font-bold">Trailer</h3>
+
+            <div className="rounded-3xl overflow-hidden w-full">
+              {/* {console.log(movie)} */}
+              {movie && (
+                <iframe
+                  // width=""
+                  // height="500"
+                  src={`https://www.youtube.com/embed/${
+                    movie?.trailer?.split("?v=")[1]
+                  }`}
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen;"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  className="w-full md:h-[26rem] aspect-video"
+                ></iframe>
+              )}
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-xl text-primary font-bold">Ratings</h3>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex relative justify-center flex-col h-32 items-center gap-3 bg-yellow-400">
+                <p className="text-5xl font-semibold">7.5</p>
+                <Image
+                  src={IMDBLogo}
+                  alt="trakt"
+                  width={80}
+                  height={80}
+                  className=""
+                />
+              </div>
+              <div className="flex relative justify-center flex-col h-32 items-center gap-3 bg-sky-900">
+                <p className="text-5xl text-white font-semibold">7.5</p>
+                <Image
+                  src={TMDBLogo}
+                  alt="trakt"
+                  width={60}
+                  height={60}
+                  className=""
+                />
+              </div>
+              <div className="flex relative justify-center flex-col h-32 items-center gap-3 bg-zinc-200">
+                <p className="text-5xl font-semibold">7.5</p>
+                <Image
+                  src={RottenTomatoesLogo}
+                  alt="trakt"
+                  width={60}
+                  height={60}
+                  className=""
+                />
+              </div>
+              <div className="flex relative justify-center flex-col h-32 items-center gap-3 bg-black">
+                <p className="text-5xl text-white font-semibold">7.5</p>
+                <Image
+                  src={MetacriticLogo}
+                  alt="trakt"
+                  width={60}
+                  height={60}
+                  className=""
+                />
+              </div>
+              <div className="flex relative justify-center flex-col h-32 items-center gap-3 bg-black">
+                <p className="text-5xl text-white font-semibold">7.5</p>
+                <Image
+                  src={TraktLogo}
+                  alt="trakt"
+                  width={60}
+                  height={60}
+                  className=""
+                />
+              </div>
+            </div>
+
+            {/* <div className="space-y-5">
+              <div className="flex items-center gap-3">
+                <Image src={TraktLogo} alt="trakt" width={45} height={45} />
+                <p className="text-lg">7.5</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Image src={IMDBLogo} alt="trakt" width={45} height={45} />
+                <p className="text-lg">7.5</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Image src={TMDBLogo} alt="trakt" width={45} height={45} />
+                <p className="text-lg">7.5</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Image
+                  src={RottenTomatoesLogo}
+                  alt="trakt"
+                  width={45}
+                  height={45}
+                />
+                <p className="text-lg">7.5</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Image
+                  src={MetacriticLogo}
+                  alt="trakt"
+                  width={45}
+                  height={45}
+                />
+                <p className="text-lg">7.5</p>
+              </div>
+            </div> */}
+          </div>
+        </div>
       </div>
     </div>
   );

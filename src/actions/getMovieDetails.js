@@ -1,5 +1,7 @@
 "use server";
 
+import { checkWatchlist } from "./checkWatchlist";
+
 export async function getMovieDetails(slug) {
   try {
     const response = await fetch(
@@ -14,6 +16,24 @@ export async function getMovieDetails(slug) {
     );
 
     const movieData = await response.json();
+
+    const ratingsTest = await fetch(
+      `https://api.trakt.tv/movies/${movieData.ids.imdb}/ratings`,
+      {
+        headers: {
+          "Content-type": "application/json",
+          "trakt-api-version": 2,
+          "trakt-api-key": process.env.CLIENT_ID,
+        },
+      }
+    );
+
+    const ratings = await ratingsTest.json();
+
+    console.log(movieData.ids.imdb);
+
+    // console.log(movieData);
+    const isInWatchlist = await checkWatchlist(movieData.ids.trakt);
 
     // Fetch the image URLs for the movie
     const imageResponse = await fetch(
@@ -35,8 +55,8 @@ export async function getMovieDetails(slug) {
       const isMatchingLanguage = movieData.language === image.iso_639_1;
 
       return (
-        (aspectRatio <= 350 / 450 || aspectRatio < 450 / image.height) &&
-        (isEnglish || isMatchingLanguage)
+        // (aspectRatio <= 350 / 450 || aspectRatio < 450 / image.height) &&
+        isEnglish || isMatchingLanguage || image
       );
     });
 
@@ -48,6 +68,8 @@ export async function getMovieDetails(slug) {
         portraitImages.length > 0 ? portraitImages[0].file_path : null,
       landscapeImageUrl:
         landscapeImages.length > 0 ? landscapeImages[0].file_path : null,
+
+      isInWatchlist: isInWatchlist,
     };
 
     return movieWithImage;

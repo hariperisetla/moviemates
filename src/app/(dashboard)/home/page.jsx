@@ -6,26 +6,11 @@ export default function Movies() {
     <div className="space-y-8 items-center w-full text-center">
       <Hero />
 
-      <div className="text-left space-y-3">
-        <h2 className="text-2xl font-semibold">
-          Next on <span className="text-primary">next watch</span> list
-        </h2>
-        <VerticalItemsList type={"watchlist"} />
-      </div>
+      <VerticalItemsList type={"watchlist"} />
 
-      <div className="text-left space-y-3">
-        <h2 className="text-2xl font-semibold">
-          Next on <span className="text-primary">next watch</span> list
-        </h2>
-        <VerticalItemsList type={"trending"} />
-      </div>
+      <VerticalItemsList type={"trending"} />
 
-      <div className="text-left space-y-3">
-        <h2 className="text-2xl font-semibold">
-          Trending <span className="text-primary">now</span>
-        </h2>
-        <VerticalItemsList type={"trending"} />
-      </div>
+      <VerticalItemsList type={"trending"} />
     </div>
   );
 }

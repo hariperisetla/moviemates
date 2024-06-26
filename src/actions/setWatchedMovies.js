@@ -47,8 +47,6 @@ export async function removeFromHistory(movieId) {
 
     const res = await response.json();
 
-    console.log(res);
-
     if (response.ok) {
       console.log("Movie removed from history successfully.");
       return "ok";

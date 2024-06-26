@@ -1,10 +1,3 @@
-import {
-  BiSolidHome,
-  BiSolidSearch,
-  BiListCheck,
-  BiSolidUserCircle,
-  BiMenu,
-} from "react-icons/bi";
 import Link from "next/link";
 import {
   IoAdd,
@@ -13,55 +6,78 @@ import {
   IoBookmarkOutline,
   IoHome,
   IoHomeOutline,
+  IoList,
   IoListOutline,
+  IoPerson,
   IoPersonOutline,
   IoSearch,
   IoSearchOutline,
 } from "react-icons/io5";
 
+import { usePathname } from "next/navigation";
+
 export default function BottomTabs() {
+  const path = usePathname();
+
   return (
     <div className="text-gray z-20 bg-white fixed bottom-0 text-center w-full py-2">
-      <Link
-        href={"/search"}
-        className="items-center -top-4 text-6xl absolute left-0 right-0 flex flex-col pb-5"
-      >
-        <IoAddCircle className="text-primary bg-white rounded-full" />
-      </Link>
-      <ul className="grid grid-cols-5 w-full text-2xl justify-between items-center bg-white">
+      <ul className="grid grid-cols-5 w-full text-2xl justify-between items-center bg-white duration-300 ease-in-out transition-all">
         <li>
           <Link
             href={"/home"}
-            className="items-center flex flex-col text-primary"
+            className={`${
+              path.includes("home") ? "text-primary font-bold" : "font-semibold"
+            } items-center flex flex-col space-y-1 duration-300 ease-in-out transition-all`}
           >
-            <IoHome />
-
-            <span className="text-sm font-semibold">Home</span>
+            {path.includes("home") ? <IoHome /> : <IoHomeOutline />}
+            <span className="text-xs">Home</span>
           </Link>
         </li>
         <li>
-          <Link href={"/search"} className="items-center flex flex-col">
-            <IoSearchOutline />
-            <span className="text-sm font-semibold">Search</span>
+          <Link
+            href={"/search"}
+            className={`${
+              path.includes("search")
+                ? "text-primary font-bold"
+                : "font-semibold"
+            } items-center flex flex-col space-y-1 duration-300 ease-in-out transition-all`}
+          >
+            {path.includes("search") ? <IoSearch /> : <IoSearchOutline />}
+            <span className="text-xs font-semibold">Search</span>
           </Link>
         </li>
-        <li></li>
+        <li className="relative">
+          <Link
+            href={"/create-list"}
+            className="items-center text-6xl flex flex-col absolute left-0 right-0 -top-12 duration-300 ease-in-out transition-all"
+          >
+            <IoAddCircle className="text-primary bg-white rounded-full" />
+          </Link>
+        </li>
         <li>
           <Link
             href={"/watchlist"}
-            className="items-center font-semibold flex flex-col"
+            className={`${
+              path.includes("watchlist")
+                ? "text-primary font-bold"
+                : "font-semibold"
+            } items-center flex flex-col space-y-1  duration-300 ease-in-out transition-all`}
           >
-            <IoListOutline />
-            <span className="text-sm font-semibold">Lists</span>
+            {path.includes("watchlist") ? <IoList /> : <IoListOutline />}
+            <span className="text-xs font-semibold">Lists</span>
           </Link>
         </li>
         <li>
           <Link
             href={"/profile"}
-            className="items-center flex font-semibold flex-col"
+            className={`${
+              path.includes("profile")
+                ? "text-primary font-bold"
+                : "font-semibold"
+            } items-center flex flex-col space-y-1 duration-300 ease-in-out transition-all`}
           >
-            <IoPersonOutline />
-            <span className="text-sm">Profile</span>
+            {path.includes("profile") ? <IoPerson /> : <IoPersonOutline />}
+            <span className="text-xs">Profile</span>
           </Link>
         </li>
         {/* <li>

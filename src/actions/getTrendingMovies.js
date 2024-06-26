@@ -1,5 +1,8 @@
 "use server";
 
+import { checkWatchlist } from "./checkWatchlist";
+
+// Function to fetch trending movies and include watchlist flag
 export async function getTrendingMovies(page = 1, limit = 10) {
   try {
     const response = await fetch(
@@ -15,9 +18,13 @@ export async function getTrendingMovies(page = 1, limit = 10) {
 
     const data = await response.json();
 
-    // Fetch image URLs for each movie
-    const moviesWithImages = await Promise.all(
+    // Fetch image URLs and add watchlist flag for each movie
+    const moviesWithImagesAndWatchlistFlag = await Promise.all(
       data.map(async (movieData) => {
+        // Check if movie is in user's watchlist
+        const isInWatchlist = await checkWatchlist(movieData.movie.ids.trakt);
+
+        // Fetch image URLs for the movie
         const imageResponse = await fetch(
           `https://api.themoviedb.org/3/movie/${movieData.movie.ids.tmdb}/images`,
           {
@@ -29,23 +36,21 @@ export async function getTrendingMovies(page = 1, limit = 10) {
         );
         const imageData = await imageResponse.json();
 
-        // Filter for portrait images with English text or matching movie language
-        const portraitImages = imageData.posters.filter((image) => {
-          return (
-            image.iso_639_1 === "en" ||
-            movieData.movie.language === image.iso_639_1
-          );
-        });
+        const portraitImages = imageData.posters;
+        const landscapeImages = imageData.backdrops;
 
         return {
-          ...movieData,
-          imageUrl:
-            portraitImages.length > 0 ? portraitImages[0].file_path : null, // Assuming you want the first poster image
+          movie: movieData.movie,
+          portraitImageUrl:
+            portraitImages.length > 0 ? portraitImages[0].file_path : null,
+          landscapeImageUrl:
+            landscapeImages.length > 0 ? landscapeImages[0].file_path : null,
+          isInWatchlist: isInWatchlist, // Add flag indicating if movie is in watchlist
         };
       })
     );
 
-    return moviesWithImages;
+    return moviesWithImagesAndWatchlistFlag;
   } catch (error) {
     console.error("Error fetching data:", error);
     return null;
