@@ -1,32 +1,7 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef } from "react";
 
-export default function List({ movies }) {
-  const listRef = useRef(null);
-
-  const scrollLeft = () => {
-    if (listRef.current) {
-      const width = listRef.current.clientWidth;
-      listRef.current.scrollBy({
-        left: -width,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const scrollRight = () => {
-    if (listRef.current) {
-      const width = listRef.current.clientWidth;
-      listRef.current.scrollBy({
-        left: width,
-        behavior: "smooth",
-      });
-    }
-  };
-
+export default function List({ items }) {
   return (
     <div>
       {/* <button
@@ -39,30 +14,30 @@ export default function List({ movies }) {
         // ref={listRef}
         className="flex justify-start items-start space-x-3 overflow-x-auto md:overflow-x-hidden h-full no-scrollbar"
       >
-        {movies &&
-          movies.map((movieData, index) => (
+        {items &&
+          items.map((itemData, index) => (
             <li key={index} className="flex flex-col space-y-3 w-32 md:w-48">
               <Link
-                href={`/movies/${movieData.movie?.ids.slug}`}
+                href={`/${itemData.type}/${itemData.item?.ids.slug}`}
                 key={index}
                 className="relative w-32 h-52 md:w-48 md:h-72 rounded-3xl overflow-hidden"
               >
                 <Image
-                  src={`https://image.tmdb.org/t/p/w500${movieData.portraitImageUrl}`}
-                  alt={movieData.movie?.title}
+                  src={`https://image.tmdb.org/t/p/w500${itemData.portraitImageUrl}`}
+                  alt={itemData.item?.title}
                   fill
                   className="object-cover object-center"
                 />
               </Link>
               <div className="w-full rounded-b-xl overflow-hidden">
                 <p className="text-black text-sm items-center flex flex-wrap">
-                  {movieData.movie?.title.length > 27
-                    ? `${movieData.movie.title.substring(0, 27)}...`
-                    : movieData.movie?.title}{" "}
+                  {itemData.item?.title.length > 27
+                    ? `${itemData.item.title.substring(0, 27)}...`
+                    : itemData.item?.title}{" "}
                   {/* {movieData.movie.title} */}
                 </p>
                 <span className="text-gray text-sm items-center">
-                  {movieData.movie?.year}
+                  {itemData.item?.year}
                 </span>
               </div>
             </li>

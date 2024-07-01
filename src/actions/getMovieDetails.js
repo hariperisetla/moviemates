@@ -48,19 +48,25 @@ export async function getMovieDetails(slug) {
 
     const imageData = await imageResponse.json();
 
-    // Filter for portrait images with aspect ratio close to 350x450 or less than the 450 ratio, and text in English or matching movie language
-    const portraitImages = imageData.posters.filter((image) => {
-      const aspectRatio = image.width / image.height;
-      const isEnglish = image.iso_639_1 === "en";
-      const isMatchingLanguage = movieData.language === image.iso_639_1;
+    const filterEnglishImages = (images) => {
+      const englishImages = images.filter((image) => image.iso_639_1 === "en");
+      return englishImages.length > 0 ? englishImages : images;
+    };
 
-      return (
-        // (aspectRatio <= 350 / 450 || aspectRatio < 450 / image.height) &&
-        isEnglish || isMatchingLanguage || image
+    const filterTitleImages = (images) => {
+      const excludedKeywords = ["title", "logo", "poster"];
+      return images.filter(
+        (image) =>
+          !excludedKeywords.some((keyword) =>
+            image.file_path.toLowerCase().includes(keyword)
+          )
       );
-    });
+    };
 
-    const landscapeImages = imageData.backdrops;
+    const portraitImages = filterEnglishImages(imageData.posters);
+    const landscapeImages = filterTitleImages(
+      filterEnglishImages(imageData.backdrops)
+    );
 
     const movieWithImage = {
       ...movieData,

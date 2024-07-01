@@ -8,82 +8,83 @@ import { setWatchlistMovies } from "@/actions/setWatchlistMovies";
 import { getWatchlistMovies } from "@/actions/getWatchlistMovies";
 import { getTrendingMovies } from "@/actions/getTrendingMovies";
 
-import { useRouter } from "next/navigation";
-import { IoIosAddCircle, IoIosAddCircleOutline, IoMdAdd } from "react-icons/io";
-import { IoAdd, IoAddCircleOutline } from "react-icons/io5";
+import { useRouter, useSearchParams } from "next/navigation";
+import { IoMdAdd } from "react-icons/io";
 
-export default function Hero() {
-  const [movies, setMovies] = useState([]);
-  const [currentMovieIndex, setCurrentMovieIndex] = useState(0);
+export default function Hero({ type = "movies" }) {
+  const [items, setItems] = useState([]);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
+
+  const params = useSearchParams();
 
   let interval = 5000;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? movies.length - 1 : currentIndex - 1;
+    const newIndex = isFirstSlide ? items?.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
   };
 
   const nextSlide = () => {
-    const isLastSlide = currentIndex === movies.length - 1;
+    const isLastSlide = currentIndex === items?.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
   };
+
+  const router = useRouter();
 
   useEffect(() => {
     const slideInterval = setInterval(nextSlide, interval);
     return () => clearInterval(slideInterval);
   }, [currentIndex, interval]);
 
-  const router = useRouter();
-
   // Function to fetch movies
-  async function fetchMovies() {
+  async function fetchItems() {
     try {
-      let moviesData;
+      let itemsData;
 
       ("use server");
-      async function getMovieData() {
-        let moviesData = await getWatchlistMovies(5);
+      async function getItemData() {
+        let itemsData = await getWatchlistMovies(5, type);
 
-        if (moviesData.length === 0) {
-          moviesData = await getTrendingMovies(undefined, 5);
+        if (itemsData.length === 0) {
+          itemsData = await getTrendingMovies(undefined, 5, type);
         } else {
           // Mark movies in watchlist with isInWatchlist = true
-          moviesData = moviesData.map((movie) => ({
-            ...movie,
+          itemsData = itemsData.map((item) => ({
+            ...item,
             isInWatchlist: true,
           }));
         }
 
-        return moviesData;
+        return itemsData;
       }
 
-      moviesData = await getMovieData();
+      itemsData = await getItemData();
 
-      console.log(moviesData);
+      console.log(itemsData);
 
-      setMovies(moviesData);
+      setItems(itemsData);
 
       const interval = setInterval(() => {
-        setCurrentMovieIndex((prevIndex) =>
-          prevIndex === moviesData.length - 1 ? 0 : prevIndex + 1
+        setCurrentItemIndex((prevIndex) =>
+          prevIndex === itemsData.length - 1 ? 0 : prevIndex + 1
         );
       }, 5000);
 
       return () => clearInterval(interval);
     } catch (error) {
-      console.error("Error fetching movies:", error);
+      console.error("Error fetching items:", error);
     }
   }
 
   // Fetch movies on component mount
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchItems();
+  }, [params]);
 
-  if (movies.length === 0) {
+  if (items.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -98,28 +99,28 @@ export default function Hero() {
     return runtime;
   }
 
-  async function handleUpdateWatchlist(movie) {
+  async function handleUpdateWatchlist(item) {
     try {
-      const updatedMovies = movies.map((m) =>
-        m.movie.ids.trakt === movie.movie.ids.trakt
+      const updatedItems = items.map((m) =>
+        m.item.ids.trakt === item.item.ids.trakt
           ? { ...m, isInWatchlist: !m.isInWatchlist }
           : m
       );
 
-      if (movie.isInWatchlist) {
+      if (item.isInWatchlist) {
         // Remove from watchlist
-        await setWatchlistMovies(movie.movie.ids.trakt);
+        await setWatchlistMovies(item.item.ids.trakt);
         // Check if movies will be empty after removal
-        if (updatedMovies.length === 1) {
-          const newMoviesData = await getTrendingMovies(undefined, 3);
-          setMovies(newMoviesData);
+        if (updatedItems.length === 1) {
+          const newItemsData = await getTrendingMovies(undefined, 3);
+          setItems(newItemsData);
         } else {
-          setMovies(updatedMovies);
+          setItems(updatedItems);
         }
       } else {
         // Add to watchlist
-        await setWatchlistMovies(movie.movie.ids.trakt);
-        setMovies(updatedMovies);
+        await setWatchlistMovies(item.item.ids.trakt);
+        setItems(updatedItems);
       }
 
       router.refresh();
@@ -130,8 +131,8 @@ export default function Hero() {
 
   return (
     <div className="relative h-[17rem] md:h-[35rem] w-full md:rounded-[3rem] overflow-hidden">
-      {movies &&
-        movies.map((movie, index) => (
+      {items &&
+        items.map((item, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-500 space-y-2 ${
@@ -139,29 +140,29 @@ export default function Hero() {
             }`}
           >
             <div className="relative h-[13rem] rounded-3xl overflow-hidden md:h-full w-full">
-              <Link href={`/movies/${movie.movie.ids.slug}`} key={index}>
+              <Link href={`/movies/${item.item?.ids?.slug}`} key={index}>
                 <div className="bg-gradient-to-t from-black from-10% to-transparent h-[13rem] md:h-[35rem] w-full absolute z-10 opacity-50"></div>
                 <Image
                   src={`https://image.tmdb.org/t/p/w1280${
-                    movie.landscapeImageUrl
-                      ? movie.landscapeImageUrl
-                      : movie.portraitImageUrl
+                    item.landscapeImageUrl
+                      ? item.landscapeImageUrl
+                      : item.portraitImageUrl
                   }`}
-                  alt={movie.movie.title + " image"}
+                  alt={item?.item?.title + " image"}
                   fill
                   className={`object-cover ${
-                    movie.landscapeImageUrl ? "object-top" : "object-center"
+                    item.landscapeImageUrl ? "object-top" : "object-center"
                   }`}
                 />
               </Link>
               <div className="flex items-end w-full md:w-auto h-full pb-3 md:pb-8">
                 <div className="md:text-left px-3 w-full md:px-8 space-y-2 md:space-y-3 text-white z-20 text-center">
                   <Link
-                    href={`/movies/${movie.movie.ids.slug}`}
+                    href={`/movies/${item?.item?.ids.slug}`}
                     className="space-y-2 md:space-y-3"
                   >
                     <div className="space-x-1 md:space-x-3 hidden md:flex justify-center md:justify-start items-center md:items-start">
-                      {movie.movie.genres.map((genre, index) => (
+                      {item.item?.genres.map((genre, index) => (
                         <p
                           key={index}
                           className="capitalize text-sm md:text-base flex items-center bg-white/30 shadow  rounded-[3rem] px-4 py-1"
@@ -171,27 +172,28 @@ export default function Hero() {
                       ))}
                     </div>
                     <h2 className="md:pb-2 text-2xl text-left flex-wrap md:text-5xl font-bold">
-                      {movie.movie.title}
+                      {item.item?.title}
                     </h2>
                     <div className="space-x-1 md:space-x-3 flex justify-start md:justify-start items-start md:items-start">
-                      {movie.movie.genres.map((genre, index) => (
+                      {item.item?.genres.map((genre, index) => (
                         <p
                           key={index}
                           className="capitalize text-sm md:text-base flex items-center shadow  rounded-[3rem] px-1"
                         >
                           {genre}
-                          {index !== movie.movie.genres.length - 1 && ","}
+                          {index !== item.item.genres.length - 1 && ","}
                         </p>
                       ))}
                     </div>
                     <div className="hidden md:flex justify-start gap-2 md:gap-5 text-sm md:text-lg">
-                      <p>{movie.movie.year}</p>
+                      <p>{item.item?.year}</p>
                       <p>|</p>
-                      <p>{getRuntime(movie.movie.runtime)}</p>
+                      <p>{getRuntime(item.item?.runtime)}</p>
                       <p>|</p>
+                      
                       <p>
-                        {movie.movie.certification
-                          ? movie.movie.certification
+                        {item.item?.certification
+                          ? item.item.certification
                           : "N/A"}
                       </p>
                     </div>
@@ -205,21 +207,16 @@ export default function Hero() {
                       <span>Mark as Watched</span>
                     </button>
 
-                    <button className="text-3xl text-primary bg-secondary rounded-3xl p-2">
-                      {/* <IoAddCircleOutline /> */}
-
+                    <button className="text-3xl md:hidden text-primary bg-secondary rounded-3xl p-2">
                       <IoMdAdd />
                     </button>
                     <button
-                      onClick={() => handleUpdateWatchlist(movie)}
+                      onClick={() => handleUpdateWatchlist(item)}
                       className={`${
-                        movie.isInWatchlist
-                          ? "bg-primary/30"
-                          : "bg-secondary/30"
+                        item.isInWatchlist ? "bg-primary/30" : "bg-secondary/30"
                       } hidden md:flex text-3xl md:text-4xl border-2 border-secondary/30 rounded-3xl md:px-4 md:py-2`}
                     >
-                      {/* {console.log(movie)} */}
-                      {movie.isInWatchlist ? (
+                      {item.isInWatchlist ? (
                         <MdBookmarkAdded />
                       ) : (
                         <MdBookmarkAdd />
@@ -238,18 +235,15 @@ export default function Hero() {
               </button>
 
               <button className="text-3xl p-2 text-primary bg-secondary rounded-2xl">
-                {/* <IoAddCircleOutline /> */}
-
                 <IoMdAdd />
               </button>
               <button
-                onClick={() => handleUpdateWatchlist(movie)}
+                onClick={() => handleUpdateWatchlist(item)}
                 className={`${
-                  movie.isInWatchlist ? "bg-primary/30" : "bg-secondary/30"
+                  item.isInWatchlist ? "bg-primary/30" : "bg-secondary/30"
                 } hidden md:flex text-3xl md:text-4xl border-2 border-secondary/30 rounded-3xl md:px-4 md:py-2`}
               >
-                {/* {console.log(movie)} */}
-                {movie.isInWatchlist ? <MdBookmarkAdded /> : <MdBookmarkAdd />}
+                {item.isInWatchlist ? <MdBookmarkAdded /> : <MdBookmarkAdd />}
               </button>
             </div>
           </div>

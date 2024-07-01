@@ -6,7 +6,7 @@ import { MdMovieCreation } from "react-icons/md";
 import { BiNotepad } from "react-icons/bi";
 import { MdFavorite } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
-import { IoMdContact } from "react-icons/io";
+import { IoIosArrowBack, IoMdContact } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 
 import { getSearchMovies } from "@/actions/getSearchMovies";
@@ -15,7 +15,7 @@ import Image from "next/image";
 
 import Logo from "@/assets/logo.svg";
 import { IoAddCircle, IoSearch } from "react-icons/io5";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 // Custom hook for debouncing
 function useDebounce(value, delay) {
@@ -54,6 +54,8 @@ function useDebounce(value, delay) {
 // }
 
 export default function DashboardLayout({ children }) {
+  const searchParams = useSearchParams();
+  const path = usePathname();
   // const genres = await getData();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -290,7 +292,27 @@ export default function DashboardLayout({ children }) {
           </div>
         </div> */}
 
-        <div className="flex justify-between w-full items-center">
+        <div
+          className={`${
+            path.includes("/movies/") ? "flex" : "hidden"
+          } md:hidden relative font-semibold flex w-full justify-center text-lg text-primary text-center`}
+        >
+          <div className="absolute left-0 top-[-0.12rem] text-3xl">
+            <button
+              onClick={() => router.back()}
+              className="border rounded-lg border-lightGray outline-none"
+            >
+              <IoIosArrowBack />
+            </button>
+          </div>{" "}
+          <p>About Movie</p>
+        </div>
+
+        <div
+          className={`${
+            path.includes("/movies/") ? "hidden" : "flex"
+          } md:hidden justify-between w-full items-center`}
+        >
           <Link
             href={"/"}
             className="pb-2 gap-2 font-bold text-primary text-xl md:text-2xl flex items-center"
@@ -305,21 +327,36 @@ export default function DashboardLayout({ children }) {
 
           <div></div>
         </div>
-        <div className="flex items-center md:pt-10 justify-between">
-          <div className="space-x-3 md:space-x-5 font-semibold text-base md:text-lg bg-secondary rounded-3xl px-3 py-1">
+        <div
+          className={`${
+            path.includes("/movies/") ? "hidden" : "flex"
+          } items-center md:pt-4 justify-between`}
+        >
+          <div className="space-x-1 md:space-x-5 font-semibold text-base md:text-lg bg-secondary md:bg-transparent rounded-3xl md:px-3 py-1">
             <Link
               href={"/"}
-              className="text-white px-3 py-2 rounded-3xl -ml-3 bg-primary"
+              className={`${
+                searchParams.get("type") === "shows"
+                  ? "text-gray"
+                  : "text-white md:text-primary bg-primary"
+              }  px-3 py-2 rounded-3xl md:bg-transparent duration-300 transition-all`}
             >
               Movies
             </Link>
 
-            <Link href={"/"} className="text-black md:text-gray">
+            <Link
+              href={"home?type=shows"}
+              className={`${
+                searchParams.get("type") === "shows"
+                  ? "text-white md:text-primary bg-primary"
+                  : "text-gray"
+              }  px-3 py-2 rounded-3xl -mr-5 md:bg-transparent`}
+            >
               Shows
             </Link>
           </div>
 
-          <div>
+          <div className="md:hidden">
             <button className="bg-secondary rounded-3xl px-3 py-1">
               Genres
             </button>

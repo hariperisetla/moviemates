@@ -2,19 +2,19 @@ import Hero from "@/components/dashboard/Hero";
 import VerticalItemsList from "@/components/dashboard/VerticalItemsList";
 import Settings from "@/components/dashboard/Settings";
 
-export default function Movies() {
+export default function Movies({ searchParams }) {
   return (
     <div className="space-y-5 md:space-y-8 items-center w-full text-center">
       {/* <Settings /> */}
-      <Hero />
+      <Hero type={searchParams.type} />
 
-      <hr className="border-lightGray" />
+      <hr className="border-lightGray md:hidden" />
 
-      <VerticalItemsList type={"watchlist"} />
+      {/* <VerticalItemsList listType={"watchlist"} /> */}
 
-      <VerticalItemsList type={"trending"} />
+      <VerticalItemsList listType={"trending"} type={searchParams.type} />
 
-      <VerticalItemsList type={"trending"} />
+      <VerticalItemsList listType={"trending"} type={searchParams.type} />
     </div>
   );
 }

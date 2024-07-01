@@ -2,11 +2,11 @@
 
 import { cookies } from "next/headers";
 
-export async function getWatchlistMovies(limit = null) {
+export async function getWatchlistMovies(limit = null, type) {
   const access_token = cookies().get("access_token").value;
   try {
     const response = await fetch(
-      `https://api.trakt.tv/sync/watchlist/movies?extended=full${
+      `https://api.trakt.tv/sync/watchlist/${type}?extended=full${
         limit ? `&limit=${limit}` : ""
       }`,
       {

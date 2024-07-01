@@ -235,9 +235,9 @@ export default function MovieDetails({ params }) {
         </div>
       )}
 
-      <div className="w-full flex justify-center">
-        {movie && (
-          <div className="px-5 md:hidden relative h-[20rem] w-[12rem] rounded-3xl overflow-hidden">
+      <div className="w-full flex gap-3">
+        {movie ? (
+          <div className="px-5 md:hidden relative h-[25rem] w-full rounded-3xl overflow-hidden">
             <Image
               src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
               alt={movie.title + " image"}
@@ -246,7 +246,97 @@ export default function MovieDetails({ params }) {
               className="object-cover object-center rounded-3xl"
             />
           </div>
+        ) : (
+          <div className="h-[25rem] w-full bg-secondary animate-pulse rounded-3xl"></div>
         )}
+
+        <div className="grid gap-2 md:hidden">
+          <div className="flex relative justify-center flex-col items-center bg-black rounded-2xl p-2">
+            <p className="text-xl text-white font-semibold">7.5</p>
+            <Image
+              src={TraktLogo}
+              alt="trakt"
+              width={30}
+              height={30}
+              className=""
+            />
+          </div>
+          <div className="flex relative justify-center flex-col items-center bg-yellow-400 rounded-2xl p-2">
+            <p className="text-xl font-semibold">7.5</p>
+            <Image
+              src={IMDBLogo}
+              alt="trakt"
+              width={50}
+              height={50}
+              className=""
+            />
+          </div>
+          <div className="flex relative justify-center flex-col items-center bg-sky-900 rounded-2xl p-2">
+            <p className="text-xl text-white font-semibold">7.5</p>
+            <Image
+              src={TMDBLogo}
+              alt="trakt"
+              width={30}
+              height={30}
+              className=""
+            />
+          </div>
+          <div className="flex relative justify-center flex-col items-center bg-zinc-200 rounded-2xl p-2">
+            <p className="text-xl font-semibold">7.5</p>
+            <Image
+              src={RottenTomatoesLogo}
+              alt="trakt"
+              width={30}
+              height={30}
+              className=""
+            />
+          </div>
+          <div className="flex relative justify-center flex-col items-center bg-black rounded-2xl p-2">
+            <p className="text-xl text-white font-semibold">7.5</p>
+            <Image
+              src={MetacriticLogo}
+              alt="trakt"
+              width={30}
+              height={30}
+              className=""
+            />
+          </div>
+        </div>
+
+        <div className="hidden md:flex flex-col space-y-2">
+          <button
+            onClick={() => handleMovieStatus()}
+            className="text-3xl p-2 text-primary bg-secondary rounded-2xl"
+          >
+            {/* <IoAddCircleOutline /> */}
+
+            <IoMdAdd />
+          </button>
+          <button
+            onClick={() => handleMovieStatus()}
+            className="text-3xl p-2 text-primary bg-secondary rounded-2xl"
+          >
+            {/* <IoAddCircleOutline /> */}
+
+            <IoMdAdd />
+          </button>
+          <button
+            onClick={() => handleMovieStatus()}
+            className="text-3xl p-2 text-primary bg-secondary rounded-2xl"
+          >
+            {/* <IoAddCircleOutline /> */}
+
+            <IoMdAdd />
+          </button>
+          <button
+            onClick={() => handleMovieStatus()}
+            className="text-3xl p-2 text-primary bg-secondary rounded-2xl"
+          >
+            {/* <IoAddCircleOutline /> */}
+
+            <IoMdAdd />
+          </button>
+        </div>
       </div>
       <div className="pt-3 space-y-8">
         {/* <div>
@@ -278,10 +368,8 @@ export default function MovieDetails({ params }) {
 
           <button
             onClick={() => handleMovieStatus()}
-            className="text-3xl p-2 text-primary bg-secondary rounded-2xl"
+            className="text-3xl px-3 py-2 text-primary bg-secondary rounded-2xl"
           >
-            {/* <IoAddCircleOutline /> */}
-
             <IoMdAdd />
           </button>
           <button
@@ -296,7 +384,17 @@ export default function MovieDetails({ params }) {
         </div>
         <div className="space-y-3">
           <h3 className="text-xl text-primary font-bold">Description</h3>
-          <p className="">{movie && movie.overview}</p>
+          {movie ? (
+            <p className="">{movie.overview}</p>
+          ) : (
+            <div className="space-y-2 animate-pulse">
+              <p className="bg-secondary/50 rounded-md w-full h-5"></p>
+              <p className="bg-secondary/50 rounded-md w-full h-5"></p>
+              <p className="bg-secondary/50 rounded-md w-full h-5"></p>
+              <p className="bg-secondary/50 rounded-md w-full h-5"></p>
+              <p className="bg-secondary/50 rounded-md w-2/3 h-5"></p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">

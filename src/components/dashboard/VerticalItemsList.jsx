@@ -3,25 +3,25 @@ import { getTrendingMovies } from "@/actions/getTrendingMovies";
 
 import List from "@/components/dashboard/List";
 
-async function getMovies(type) {
-  let newMovies = [];
+async function getMovies(listType, type) {
+  let newItems = [];
 
-  switch (type) {
+  switch (listType) {
     case "watchlist":
-      newMovies = await getWatchlistMovies();
+      newItems = await getWatchlistMovies();
       break;
     case "trending":
-      newMovies = await getTrendingMovies();
+      newItems = await getTrendingMovies(undefined, 10, type);
   }
-  return newMovies;
+  return newItems;
 }
 
-export default async function VerticalItemsList({ type }) {
-  const movies = await getMovies(type);
+export default async function VerticalItemsList({ listType, type }) {
+  const items = await getMovies(listType, type);
 
   return (
     <div className="text-left">
-      {movies.length > 0 && (
+      {items.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-2xl font-semibold">
             {type === "watchlist" ? (
@@ -39,7 +39,7 @@ export default async function VerticalItemsList({ type }) {
             )}
           </h2>
           <div className="relative">
-            <List movies={movies} />
+            <List items={items} />
           </div>
         </div>
       )}

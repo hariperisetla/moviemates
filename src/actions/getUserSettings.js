@@ -17,29 +17,9 @@ export async function getUserSettings() {
 
     const data = await response.json();
 
-    // console.log(data.user.images);
-
     // console.log(data);
 
-    const listsResponse = await fetch(
-      `https://api.trakt.tv/users/${data.user.username}/lists/
-28209205`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: `Bearer ${access_token}`,
-          "trakt-api-version": 2,
-          "trakt-api-key": process.env.CLIENT_ID,
-        },
-      }
-    );
-
-    const lists = await listsResponse.json();
-
-    console.log(lists);
-
-    return lists;
+    return data;
   } catch (error) {
     console.log("Error marking movie as watched: " + error);
   }
