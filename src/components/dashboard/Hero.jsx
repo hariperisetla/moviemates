@@ -9,6 +9,8 @@ import { getWatchlistMovies } from "@/actions/getWatchlistMovies";
 import { getTrendingMovies } from "@/actions/getTrendingMovies";
 
 import { useRouter } from "next/navigation";
+import { IoIosAddCircle, IoIosAddCircleOutline, IoMdAdd } from "react-icons/io";
+import { IoAdd, IoAddCircleOutline } from "react-icons/io5";
 
 export default function Hero() {
   const [movies, setMovies] = useState([]);
@@ -127,18 +129,18 @@ export default function Hero() {
   }
 
   return (
-    <div className="relative h-[15rem] md:h-[35rem] w-full rounded-3xl md:rounded-[3rem] overflow-hidden">
-      <div className="relative h-64 md:h-full">
-        {movies &&
-          movies.map((movie, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-500 ${
-                index === currentIndex ? "opacity-100" : "opacity-0"
-              }`}
-            >
+    <div className="relative h-[17rem] md:h-[35rem] w-full md:rounded-[3rem] overflow-hidden">
+      {movies &&
+        movies.map((movie, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-500 space-y-2 ${
+              index === currentIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <div className="relative h-[13rem] rounded-3xl overflow-hidden md:h-full w-full">
               <Link href={`/movies/${movie.movie.ids.slug}`} key={index}>
-                <div className="bg-gradient-to-t from-black from-10% to-transparent h-[15rem] md:h-[35rem] w-full absolute z-10 opacity-50"></div>
+                <div className="bg-gradient-to-t from-black from-10% to-transparent h-[13rem] md:h-[35rem] w-full absolute z-10 opacity-50"></div>
                 <Image
                   src={`https://image.tmdb.org/t/p/w1280${
                     movie.landscapeImageUrl
@@ -153,7 +155,7 @@ export default function Hero() {
                 />
               </Link>
               <div className="flex items-end w-full md:w-auto h-full pb-3 md:pb-8">
-                <div className="md:text-left px-5 md:px-8 space-y-2 md:space-y-3 text-white z-20 text-center">
+                <div className="md:text-left px-3 w-full md:px-8 space-y-2 md:space-y-3 text-white z-20 text-center">
                   <Link
                     href={`/movies/${movie.movie.ids.slug}`}
                     className="space-y-2 md:space-y-3"
@@ -195,12 +197,18 @@ export default function Hero() {
                     </div>
                   </Link>
 
-                  <div className="flex z-20 w-full justify-center md:justify-start items-center text-sm md:text-xl font-semibold gap-3">
-                    <button className="text-primary w-full md:w-auto border-2 border-secondary bg-secondary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3">
+                  <div className="hidden md:flex z-20 w-full justify-center md:justify-start items-center text-sm md:text-xl font-semibold gap-3 pb-3">
+                    <button className="text-secondary shadow-md w-full md:w-auto border-2 border-primary bg-primary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3">
                       Tell A Mate
                     </button>
-                    <button className="border-2 border-secondary/50 w-full md:w-auto flex items-center gap-2 shadow-md text-white md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl">
+                    <button className="border-2 hidden md:flex border-secondary/50 w-full md:w-auto items-center gap-2 shadow-md text-white md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl">
                       <span>Mark as Watched</span>
+                    </button>
+
+                    <button className="text-3xl text-primary bg-secondary rounded-3xl p-2">
+                      {/* <IoAddCircleOutline /> */}
+
+                      <IoMdAdd />
                     </button>
                     <button
                       onClick={() => handleUpdateWatchlist(movie)}
@@ -208,72 +216,44 @@ export default function Hero() {
                         movie.isInWatchlist
                           ? "bg-primary/30"
                           : "bg-secondary/30"
-                      }  text-sm md:text-xl border-2 border-secondary/30  rounded-3xl md:px-4 md:py-2`}
+                      } hidden md:flex text-3xl md:text-4xl border-2 border-secondary/30 rounded-3xl md:px-4 md:py-2`}
                     >
                       {/* {console.log(movie)} */}
                       {movie.isInWatchlist ? (
-                        <MdBookmarkAdded size={35} />
+                        <MdBookmarkAdded />
                       ) : (
-                        <MdBookmarkAdd size={35} />
+                        <MdBookmarkAdd />
                       )}
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
-      </div>
+            <div className="flex z-20 w-full justify-center md:justify-start items-center md:text-xl font-semibold gap-2 md:gap-3 pb-3">
+              <button className="text-secondary w-full md:w-auto border-2 border-primary bg-primary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3">
+                Tell A Mate
+              </button>
+              <button className="border-2 hidden md:flex border-secondary/50 w-full md:w-auto items-center gap-2 shadow-md text-white md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl">
+                <span>Mark as Watched</span>
+              </button>
 
-      {/* <button
-        type="button"
-        onClick={prevSlide}
-        class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-        data-carousel-prev
-      >
-        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-          <svg
-            class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 6 10"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 1 1 5l4 4"
-            />
-          </svg>
-          <span class="sr-only">Previous</span>
-        </span>
-      </button>
-      <button
-        type="button"
-        onClick={nextSlide}
-        class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-        data-carousel-next
-      >
-        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-          <svg
-            class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 6 10"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="m1 9 4-4-4-4"
-            />
-          </svg>
-          <span class="sr-only">Next</span>
-        </span>
-      </button> */}
+              <button className="text-3xl p-2 text-primary bg-secondary rounded-2xl">
+                {/* <IoAddCircleOutline /> */}
+
+                <IoMdAdd />
+              </button>
+              <button
+                onClick={() => handleUpdateWatchlist(movie)}
+                className={`${
+                  movie.isInWatchlist ? "bg-primary/30" : "bg-secondary/30"
+                } hidden md:flex text-3xl md:text-4xl border-2 border-secondary/30 rounded-3xl md:px-4 md:py-2`}
+              >
+                {/* {console.log(movie)} */}
+                {movie.isInWatchlist ? <MdBookmarkAdded /> : <MdBookmarkAdd />}
+              </button>
+            </div>
+          </div>
+        ))}
     </div>
   );
 }

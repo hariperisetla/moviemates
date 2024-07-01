@@ -12,7 +12,7 @@ import { BsBookmark } from "react-icons/bs";
 import { MdBookmarkAdd, MdBookmarkAdded } from "react-icons/md";
 
 import { getPersons } from "@/actions/getPersons";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward, IoMdAdd } from "react-icons/io";
 import { IoPerson } from "react-icons/io5";
 
 import TraktLogo from "@/assets/trakt-icon-red.svg";
@@ -20,6 +20,8 @@ import IMDBLogo from "@/assets/IMDB.svg";
 import RottenTomatoesLogo from "@/assets/Rotten_Tomatoes.png";
 import TMDBLogo from "@/assets/Tmdb.new.logo.png";
 import MetacriticLogo from "@/assets/Metacritic_M.png";
+
+import BottomSheet from "@/components/dashboard/BottomSheet";
 
 import { setWatchlistMovies } from "@/actions/setWatchlistMovies";
 
@@ -31,6 +33,9 @@ export default function MovieDetails({ params }) {
   const [itemsPerPage, setItemsPerPage] = useState(7); // Number of persons to display at a time
   const [isWatched, setIsWatched] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
+
+  const [bottomSheet, setBottomSheet] = useState(false);
+  const [statusFlag, setStatusFlag] = useState(false);
 
   useEffect(() => {
     async function fetchMovieDetails() {
@@ -118,8 +123,13 @@ export default function MovieDetails({ params }) {
   };
   const displayedPersons = person?.slice(startIndex, startIndex + itemsPerPage);
 
+  const handleMovieStatus = () => {
+    setBottomSheet(!bottomSheet);
+    setStatusFlag("status");
+  };
+
   return (
-    <div className="movie-details pb-10">
+    <div className="relative movie-details pb-10">
       {movie && (
         <div className="relative hidden md:flex w-full h-[15rem] md:h-[35rem] rounded-[2rem] md:rounded-[3rem] overflow-hidden">
           <div className="absolute h-[15rem] md:h-full w-full z-0">
@@ -225,17 +235,19 @@ export default function MovieDetails({ params }) {
         </div>
       )}
 
-      {movie && (
-        <div className="px-5 md:hidden relative h-[30rem] w-full rounded-3xl overflow-hidden">
-          <Image
-            src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
-            alt={movie.title + " image"}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover object-center rounded-3xl"
-          />
-        </div>
-      )}
+      <div className="w-full flex justify-center">
+        {movie && (
+          <div className="px-5 md:hidden relative h-[20rem] w-[12rem] rounded-3xl overflow-hidden">
+            <Image
+              src={`https://image.tmdb.org/t/p/w1280${movie.portraitImageUrl}`}
+              alt={movie.title + " image"}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover object-center rounded-3xl"
+            />
+          </div>
+        )}
+      </div>
       <div className="pt-3 space-y-8">
         {/* <div>
           <button
@@ -250,31 +262,36 @@ export default function MovieDetails({ params }) {
         {/* <h1 className="text-primary text-2xl font-bold">
           {movie && movie.title}
         </h1> */}
-        <div className="flex md:hidden justify-center md:justify-start items-center md:text-xl font-semibold gap-3">
-          {/* <button
-            onClick={addWatched}
-            className="text-base md:text-xl text-primary border-2 border-secondary bg-secondary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3"
+        <div className="flex z-20 w-full justify-center md:justify-start items-center md:text-xl font-semibold gap-2 md:gap-3 pb-3">
+          <button
+            onClick={() => {
+              setBottomSheet(!bottomSheet);
+              setStatusFlag("mate");
+            }}
+            className="text-secondary w-full md:w-auto border-2 border-primary bg-primary rounded-2xl md:rounded-3xl px-3 py-2 md:px-8 md:py-3"
           >
             Tell A Mate
-          </button> */}
+          </button>
+          <button className="border-2 hidden md:flex border-secondary/50 w-full md:w-auto items-center gap-2 shadow-md text-white md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl">
+            <span>Mark as Watched</span>
+          </button>
+
           <button
-            className={`${
-              isWatched
-                ? "border-2 border-green-500 bg-green-500/30"
-                : "border-2 border-secondary bg-secondary"
-            }  flex justify-center items-center gap-2 w-full text-black/75 md:text-xl px-3 py-2 md:px-5 md:py-3 rounded-2xl md:rounded-3xl`}
+            onClick={() => handleMovieStatus()}
+            className="text-3xl p-2 text-primary bg-secondary rounded-2xl"
           >
-            {/* <span>
-                      <BiBookmark size={25} />
-                    </span> */}
-            <span>{isWatched ? "Watched" : "Mark as Watched"}</span>
+            {/* <IoAddCircleOutline /> */}
+
+            <IoMdAdd />
           </button>
           <button
-            onClick={addWatched}
-            className="flex justify-center w-full items-center md:text-xl border-2 border-primary bg-primary text-white rounded-2xl md:rounded-3xl px-2 py-2 md:px-4 md:py-2"
+            onClick={() => handleUpdateWatchlist(movie)}
+            className={`${
+              isWatched ? "bg-primary/30" : "bg-secondary/30"
+            } hidden md:flex text-3xl md:text-4xl border-2 border-secondary/30 rounded-3xl md:px-4 md:py-2`}
           >
-            {/* <MdBookmarkAdd size={30} />  */}
-            <span>Add to Watchlist</span>
+            {/* {console.log(movie)} */}
+            {isWatched ? <MdBookmarkAdded /> : <MdBookmarkAdd />}
           </button>
         </div>
         <div className="space-y-3">
@@ -285,7 +302,7 @@ export default function MovieDetails({ params }) {
         <div className="space-y-3">
           <div className="justify-between flex">
             <h3 className="text-xl text-primary font-bold">Cast</h3>
-            <div className="flex text-3xl text-gray gap-3">
+            <div className="hidden md:flex text-3xl text-gray gap-3">
               <button
                 className="border rounded-full border-lightGray outline-none"
                 onClick={handleBackward}
@@ -302,13 +319,45 @@ export default function MovieDetails({ params }) {
             </div>
           </div>
           <div
-            className={`flex md:flex-wrap gap-2 md:gap-7 overflow-hidden ${
+            className={`hidden md:flex md:flex-wrap gap-2 md:gap-7 md:overflow-hidden ${
               displayedPersons?.length < itemsPerPage
                 ? "justify-start"
                 : "justify-evenly"
             }`}
           >
             {displayedPersons?.map((person, index) => (
+              <div key={index} className="text-wrap flex flex-col">
+                <div className="rounded-3xl md:rounded-[2rem] overflow-hidden w-16 h-20 md:h-40 md:w-32 relative">
+                  {person.profileImageUrl ? (
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w200${person.profileImageUrl}`}
+                      alt={person.character}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover object-top"
+                    />
+                  ) : (
+                    <div className="bg-lightGray h-full text-center flex justify-center items-center">
+                      <IoPerson className="text-9xl text-gray" />
+                    </div>
+                  )}
+                </div>
+                <div className="w-20 md:w-32 text-wrap">
+                  <p className="flex flex-wrap text-sm md:text-base">
+                    {person.person.name}
+                  </p>
+                  <p className="text-gray break-words text-sm md:text-base">
+                    {person.character}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className={`flex md:hidden md:flex-wrap gap-2 md:gap-7 overflow-x-auto no-scrollbar`}
+          >
+            {person?.map((person, index) => (
               <div key={index} className="text-wrap flex flex-col">
                 <div className="rounded-3xl md:rounded-[2rem] overflow-hidden w-16 h-20 md:h-40 md:w-32 relative">
                   {person.profileImageUrl ? (
@@ -504,6 +553,13 @@ export default function MovieDetails({ params }) {
           </div>
         </div>
       </div>
+
+      <BottomSheet
+        bottomSheet={bottomSheet}
+        setBottomSheet={setBottomSheet}
+        statusFlag={statusFlag}
+        setStatusFlag={setStatusFlag}
+      />
     </div>
   );
 }

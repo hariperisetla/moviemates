@@ -290,18 +290,42 @@ export default function DashboardLayout({ children }) {
           </div>
         </div> */}
 
-        <div className="flex items-center pt-10 justify-between">
-          <div className="space-x-5 font-semibold text-lg">
-            <Link href={"/"} className="text-primary">
+        <div className="flex justify-between w-full items-center">
+          <Link
+            href={"/"}
+            className="pb-2 gap-2 font-bold text-primary text-xl md:text-2xl flex items-center"
+          >
+            <div className="relative">
+              <Image src={Logo} alt="logo" width="30" height="30" />
+            </div>
+            <p className="text-primary pt-1">
+              Movie<span className="text-gray">Mates</span>
+            </p>
+          </Link>
+
+          <div></div>
+        </div>
+        <div className="flex items-center md:pt-10 justify-between">
+          <div className="space-x-3 md:space-x-5 font-semibold text-base md:text-lg bg-secondary rounded-3xl px-3 py-1">
+            <Link
+              href={"/"}
+              className="text-white px-3 py-2 rounded-3xl -ml-3 bg-primary"
+            >
               Movies
             </Link>
 
-            <Link href={"/"} className="text-gray">
+            <Link href={"/"} className="text-black md:text-gray">
               Shows
             </Link>
           </div>
 
-          <div className="relative justify-end flex">
+          <div>
+            <button className="bg-secondary rounded-3xl px-3 py-1">
+              Genres
+            </button>
+          </div>
+
+          <div className="relative justify-end hidden md:flex">
             <IoSearch
               size={25}
               className="text-gray absolute left-5 top-1 w-2/3"
